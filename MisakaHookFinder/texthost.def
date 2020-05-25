@@ -1,0 +1,10 @@
+LIBRARY "texthost"
+EXPORTS
+  TextHostInit @1
+  InjectProcess @2
+  DetachProcess @3
+  InsertHook @4
+  RemoveHook @5
+  SearchForText @6
+  SearchForHooks @7
+  AddClipboardThread @8

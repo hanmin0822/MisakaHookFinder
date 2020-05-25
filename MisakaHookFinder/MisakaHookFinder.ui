@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MisakaHookFinderClass</class>
+ <widget class="QMainWindow" name="MisakaHookFinderClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>715</width>
+    <height>620</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MisakaHookFinder</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0" colspan="2">
+     <widget class="QComboBox" name="ProcessesCombox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2" colspan="3">
+     <widget class="QComboBox" name="HookFuncCombox"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="AttachBtn">
+      <property name="minimumSize">
+       <size>
+        <width>50</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>注入进程</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="CustomHookCodeBtn">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>70</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>添加指定特殊码</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2" rowspan="3" colspan="3">
+     <widget class="QPlainTextEdit" name="TextOutPutBox">
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QPushButton" name="SearchForHookBtn">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>50</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>查找特殊码</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QPushButton" name="SearchForTextBtn">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>70</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>根据文本搜索</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" rowspan="2" colspan="2">
+     <widget class="QPlainTextEdit" name="ConsoleTextBox">
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="readOnly">
+       <bool>false</bool>
+      </property>
+      <property name="plainText">
+       <string>MisakaHookFinder V1.0
+开源网址：https://github.com/hanmin0822/MisakaHookFinder
+
+如果觉得本工具好用请标星，这是作者开发的动力。
+
+本项目属于MisakaTranslator的子项目(https://github.com/hanmin0822/MisakaTranslator)。
+
+本工具专用于搜索某些难以找到的文本钩子并可以提供更加稳定的Hook，MisakaTranslator可以通过使用剪贴板读取来获得这个软件的内容。
+
+作者联系:512240272@qq.com
+</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
+     <widget class="QPushButton" name="ClipbordFlushBtn">
+      <property name="text">
+       <string>开启剪贴板更新</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="3">
+     <widget class="QPushButton" name="CopyHookCodeBtn">
+      <property name="text">
+       <string>复制该特殊码</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="4">
+     <widget class="QPushButton" name="RemoveHookBtn">
+      <property name="text">
+       <string>移除此钩子</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="MisakaHookFinder.qrc"/>
+ </resources>
+ <connections/>
+</ui>
