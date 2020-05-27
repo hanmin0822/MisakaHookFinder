@@ -3,7 +3,9 @@
 MisakaHookFinder* s_this = nullptr;
 
 static bool isOpenClipboard = false;
-static int currentFun = -1;
+static bool isCustomAttach = false;
+static QString customHookcode = "";
+static uint64_t currentFun = -1;
 
 MisakaHookFinder::MisakaHookFinder(QWidget *parent)
     : QMainWindow(parent)
@@ -37,6 +39,7 @@ MisakaHookFinder::MisakaHookFinder(QWidget *parent)
 	connect(s_this, SIGNAL(onHookFunComboxChange(QString,int)), this, SLOT(HookFunCombox_Change(QString,int)));
 	connect(s_this, SIGNAL(onOpenResWin()), this, SLOT(Reswin_Open()));
 	connect(s_this, SIGNAL(onClipboardChange(QString)), this, SLOT(Clipboard_Change(QString)));
+	connect(s_this, SIGNAL(onRemoveHookFun(uint64_t)), this, SLOT(HookFun_Remove(uint64_t)));
 }
 
 /*************************
@@ -101,6 +104,7 @@ void MisakaHookFinder::AttachProcessBtn_Click() {
 		TextHost::InjectProcess(pid);
 
 		isHooking = true;
+		isCustomAttach = false;
 	}
 	else {
 		TextHost::DetachProcess(pid);
@@ -110,11 +114,15 @@ void MisakaHookFinder::AttachProcessBtn_Click() {
 
 		ui.ProcessesCombox->setEnabled(true);
 		isHooking = false;
+		isCustomAttach = false;
 	}
 }
 
 
 void MisakaHookFinder::CustomHookCodeBtn_Click() {
+	if (isHooking == false) {
+		QMessageBox::information(NULL, QStringLiteral("提示"), QStringLiteral("在使用指定特殊码直接注入游戏进程时，特殊码的输入格式有所变化，请参考说明或教程，确认知悉后再使用！"));
+	}
 
 	bool isOK;
 	QString text = QInputDialog::getText(NULL, QStringLiteral("输入特殊码"),
@@ -126,6 +134,17 @@ void MisakaHookFinder::CustomHookCodeBtn_Click() {
 	if (isOK) {
 		QVariant var = ui.ProcessesCombox->currentData();
 		DWORD pid = (DWORD)var.toInt();
+
+		if (isHooking == false) {
+			//在没注入进程的情况下，先初始化，再注入，然后进行对比，不满足要求的直接移除
+			TextHost::TextHostInit(pe, pe, oct, ort, opt);
+			TextHost::InjectProcess(pid);
+			ui.ConsoleTextBox->appendPlainText(QStringLiteral("注入进程PID:") + var.toString());
+			ui.AttachBtn->setText(QStringLiteral("结束注入"));
+			customHookcode = text;
+			isCustomAttach = true;
+			isHooking = true;
+		}
 		TextHost::InsertHook(pid, text.toStdWString().c_str());
 	}
 }
@@ -183,6 +202,7 @@ void MisakaHookFinder::CopyHookCodeBtn_Click() {
 	clipboard->setText(ui.HookFuncCombox->currentText());                          //设置剪贴板内容
 
 	QMessageBox::information(NULL, QStringLiteral("提示"), QStringLiteral("复制特殊码到剪贴板成功！"));
+	
 }
 
 void MisakaHookFinder::ClipbordFlushBtn_Click() {
@@ -236,12 +256,13 @@ QString MisakaHookFinder::TextThreadString(int64_t thread_id, DWORD processId, u
 ***************************/
 uint64_t MisakaHookFinder::GetAddressByHookComboxContent(QString str) {
 	QStringList sitem = str.split(":");
-	return sitem[2].toULongLong();
+	return sitem[2].toULongLong((bool*)nullptr, 16);
 }
 
 
 void MisakaHookFinder::HookFunCombox_currentIndexChanged(int index) {
-	currentFun = index;
+	QStringList sitem = ui.HookFuncCombox->currentText().split(":");
+	currentFun = sitem[0].toULongLong((bool*)nullptr,16);
 	ui.TextOutPutBox->clear();
 }
 
@@ -252,8 +273,25 @@ void MisakaHookFinder::ProcessEventHandle(DWORD processId) {
 void MisakaHookFinder::OnCreateThreadHandle(int64_t thread_id, DWORD processId, uint64_t addr, uint64_t context, uint64_t subcontext, LPCWSTR name, LPCWSTR hookcode) {
 	PrintToUI(0,QStringLiteral("添加Hook线程ID") + QString::fromStdString(std::to_string(thread_id)));
 
-	QString str = TextThreadString(thread_id, processId, addr, context, subcontext, name, hookcode);
-	AddHookFunc(str, thread_id);
+	if (isCustomAttach == true) {
+		//在使用特定特殊码注入的情况下，遇到特殊码不一致的直接删
+		QString currentHookcode = QString::fromStdWString(hookcode);
+		QStringList sitem = currentHookcode.split(":");
+		if (customHookcode.compare(sitem[0], Qt::CaseInsensitive) != 0) {
+			PrintToUI(0, QStringLiteral("智能删除Hook:") + QString::fromStdWString(hookcode));
+			RemoveHookFun(addr);
+		}
+		else {
+			QString str = TextThreadString(thread_id, processId, addr, context, subcontext, name, hookcode);
+			AddHookFunc(str, thread_id);
+		}
+	}
+	else {
+		QString str = TextThreadString(thread_id, processId, addr, context, subcontext, name, hookcode);
+		AddHookFunc(str, thread_id);
+	}
+
+	
 }
 
 void MisakaHookFinder::OnRemoveThreadHandle(int64_t thread_id) {
@@ -349,4 +387,18 @@ void MisakaHookFinder::emitClipboardSignal(QString str) {
 void MisakaHookFinder::Clipboard_Change(QString str) {
 	QClipboard* clipboard = QApplication::clipboard();   //获取系统剪贴板指针
 	clipboard->setText(str);
+}
+
+void MisakaHookFinder::RemoveHookFun(uint64_t thread) {
+	s_this->emitRemoveHookFunSignal(thread);
+}
+
+void MisakaHookFinder::emitRemoveHookFunSignal(uint64_t thread) {
+	emit this->onRemoveHookFun(thread);
+}
+
+void MisakaHookFinder::HookFun_Remove(uint64_t thread) {
+	QVariant var = ui.ProcessesCombox->currentData();
+	DWORD pid = (DWORD)var.toInt();
+	TextHost::RemoveHook(pid,thread);
 }

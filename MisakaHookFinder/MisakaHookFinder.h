@@ -49,11 +49,15 @@ private:
     //更新剪贴板内容
     static void FlushClipboard(QString str);
 
+    //删除一个Hook方法
+    static void RemoveHookFun(uint64_t thread);
+
     void emitConsoleBoxSignal(QString str);
     void emitGameTextBoxSignal(QString str);
     void emitHookFunComboxSignal(QString str, int data);
     void emitResultWinSignal();
     void emitClipboardSignal(QString str);
+    void emitRemoveHookFunSignal(uint64_t thread);
 
 private:
     void GetProcessesList();
@@ -67,6 +71,7 @@ signals:
     void onHookFunComboxChange(QString str,int data);
     void onClipboardChange(QString str);
     void onOpenResWin();
+    void onRemoveHookFun(uint64_t thread);
 
 public slots:
     void AttachProcessBtn_Click();
@@ -83,6 +88,7 @@ public slots:
     void HookFunCombox_Change(QString str,int data);
     void Clipboard_Change(QString str);
     void Reswin_Open();
+    void HookFun_Remove(uint64_t thread);
 
 private:
     void closeEvent(QCloseEvent* event);
