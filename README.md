@@ -17,8 +17,8 @@
 
 MisakaHookFinder采用Textractor作为Hook部分模块，最大程度对其精简，保证稳定的同时使搜寻Hook的过程更加便捷和简单，易于新手使用。
 
-MisakaHookFinder可以搜索到很多常规模式下搜索不到的文本钩子，得到的特殊码在目前业界的几款软件(例如VNR、MisakaTranslator等)中通用，
-同时还支持剪贴板输出以便其他软件调用翻译。
+MisakaHookFinder可以搜索到很多常规模式下搜索不到的文本钩子，得到的特殊码在目前知名的几款翻译软件(例如YUKI、MisakaTranslator等)中通用，
+同时还支持剪贴板输出以便其他软件（如VNR等）调用翻译。
 
 ## 使用教程和说明
 
